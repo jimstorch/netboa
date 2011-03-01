@@ -18,7 +18,9 @@ from netboa.tcp.tcp_error import NetboaConnectionLost
 
 
 class Client(object):
-
+    """
+    Base Client Class.
+    """
     def __init__(self, sock, address, port):
         self.fd = sock.fileno()
         self.sock = sock

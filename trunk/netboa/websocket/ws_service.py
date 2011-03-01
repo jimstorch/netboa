@@ -41,34 +41,34 @@ from netboa.websocket.ws_error import NetboaWsBadRequest
 from netboa.websocket.handshake75 import handshake75
 
 
+def debug_on_connect(client):
+    print('[WebSocket] New Connection from %s' % client.origin)
+
+def debug_on_disconnect(client):
+    print('[WebSocket] Lost Connection from %s' % client.origin) 
+
 def debug_on_input(client):
-    print('[WEBSOCKET] Input from %s' % client.origin)
+    print('[WebSocket] Input from %s' % client.origin)
     print repr(client.get_input())
     client.send('Message Received')
 
-def debug_on_connect(client):
-    print('[WEBSOCKET] New Connection from %s' % client.origin)
-
-def debug_on_disconnect(client):
-    print('[WEBSOCKET] Lost Connection from %s' % client.origin) 
-
 def tmp_on_connect(client):
     """Do nothing, pre-handshake placeholder."""
-    print('[PRE-NEGOTIATED WEBSOCKET] New Connection from %s' % client.origin)
+    print('[Pre-Negotiated WebSocket] New Connection from %s' % client.origin)
     pass 
 
 def tmp_on_disconnect(client):
     """Do nothing, pre-handshake placeholder."""
-    print('[PRE-NEGOTIATED WEBSOCKET] Lost Connection from %s' % client.origin) 
+    print('[Pre-Negotiated WebSocket] Lost Connection from %s' % client.origin) 
     pass 
 
 def handshake(client):
     """Negotiate a persistent WebSocket with the browser -- OR DIE!"""
-    print('[WEBSOCKET HANDSHAKE] Input from %s' % client.origin)
+    print('[WebSocket Handshake] Input from %s' % client.origin)
     try:
         handshake75(client)
     except NetboaWsBadRequest, error:
-        print('[WEBSOCKET ERROR] %s' % error)
+        print('[WebSocket Error] %s' % error)
         client.deactivate()
     else:
         client.on_connect = client.service.active_on_connect
