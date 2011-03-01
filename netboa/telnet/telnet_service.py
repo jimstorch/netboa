@@ -30,14 +30,6 @@ def debug_on_input(client):
     print repr(client.get_input())
     client.send('Message Received\r\n')
 
-
-
-
-
-
-
-
-
 class TelnetService(Service):
 
     def __init__(self, on_connect=debug_on_connect, 
