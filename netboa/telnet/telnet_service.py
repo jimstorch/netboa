@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-#   netboa/debug.py
+#   netboa/telnet/telnet_service.py
 #   Copyright 2011 Jim Storch
 #   Licensed under the Apache License, Version 2.0 (the "License"); you may
 #   not use this file except in compliance with the License. You may obtain a
@@ -11,12 +11,37 @@
 #   under the License.
 #------------------------------------------------------------------------------
 
+import sys
+import socket
+
+from netboa.coroutine import coroutine
+from netboa.service import Service
+from netboa.telnet.telnet_client import TelnetClient
+
+
 def debug_on_connect(client):
-    print('+++ New connection from %s.' % client.origin)
-  
+    print('[Telnet] New Connection from %s' % client.origin)
+
 def debug_on_disconnect(client):
-    print('--- Lost connection to %s.' % client.origin)
+    print('[Telnet] Lost Connection from %s' % client.origin) 
 
 def debug_on_input(client):
-    print('>>> Input from %s.' % client.origin)
-    print client.get_input()
+    print('[Telnet] Input from %s' % client.origin)
+    print repr(client.get_input())
+    client.send('Message Received\r\n')
+
+
+
+
+
+
+
+
+
+class TelnetService(Service):
+
+    def __init__(self, on_connect=debug_on_connect, 
+            on_disconnect=debug_on_disconnect, on_input=debug_on_input,
+            port=7778, address=''):
+        Service.__init__(self, on_connect, on_disconnect, on_input, port,
+            address)

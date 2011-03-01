@@ -15,11 +15,22 @@ import sys
 import socket
 
 from netboa.client import Client
-from netboa.debug import debug_on_connect
-from netboa.debug import debug_on_input
-from netboa.debug import debug_on_disconnect
+
+def debug_on_connect(client):
+    print('[Base Service] New connection from %s.' % client.origin)
+  
+def debug_on_disconnect(client):
+    print('[Base Service] Lost connection to %s.' % client.origin)
+
+def debug_on_input(client):
+    print('[Base Service] Input from %s.' % client.origin)
+    print repr(client.get_input())
+
 
 class Service(object):
+    """
+    Base Service Class
+    """
     def __init__(self, on_connect=debug_on_connect, 
             on_disconnect=debug_on_disconnect, on_input=debug_on_input,
             port=7777,  address=''):

@@ -23,15 +23,19 @@
 
 
 from netboa import Server
+from netboa import Service
 from netboa.http import HttpService
 from netboa.websocket import WebSocketService
+from netboa.telnet import TelnetService
 
 ## Create our services
-http = HttpService(port=7777)
+service = Service(port=7776)
+telnet = TelnetService(port=7777)
 websocket = WebSocketService(port=7778)
+http = HttpService(port=7779)
 
 ## Create our server
-server = Server((http, websocket))
+server = Server((service, telnet, websocket, http))
 
 print '--> Starting Server.  Press CTRL-C to exit.'
 while True:
