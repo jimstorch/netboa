@@ -29,7 +29,6 @@ class Client(object):
         self.origin = '%s:%d' % (address, port)
         self.send_buffer = ''
         self.recv_buffer = ''
-        self.has_output = False
         self.connect_time = time.time()
         self.last_input_time = self.connect_time
         self.on_connect = None
@@ -47,9 +46,7 @@ class Client(object):
     def send(self, data):
         if data:
             self.send_buffer += data
-            if not self.has_output:            
-                self.has_output = True
-                self.server._request_send(self)
+            self.server._request_send(self)
 
     def get_char(self):
         if self.recv_buffer:
@@ -68,6 +65,9 @@ class Client(object):
     def duration(self):
         return time.time() - self.connect_time
 
+    def has_output(self):
+        return len(self.send_buffer) > 0
+
     def _socket_send(self):
         size = len(self.send_buffer)
         try:
@@ -77,7 +77,6 @@ class Client(object):
         if sent < size:
             self.send_buffer = self.send_buffer[sent:]
         else:
-            self.has_output = False
             self.send_buffer = ''
             self.server._clear_send(self)
 

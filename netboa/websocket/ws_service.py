@@ -38,7 +38,7 @@ import socket
 from netboa.service import Service
 from netboa.websocket.ws_client import WsClient
 from netboa.websocket.ws_error import NetboaWsBadRequest
-from netboa.websocket.handshake75 import handshake75
+from netboa.websocket.handshake76 import handshake76
 
 
 def debug_on_connect(client):
@@ -66,7 +66,7 @@ def handshake(client):
     """Negotiate a persistent WebSocket with the browser -- OR DIE!"""
     print('[WebSocket Handshake] Input from %s' % client.origin)
     try:
-        handshake75(client)
+        handshake76(client)
     except NetboaWsBadRequest, error:
         print('[WebSocket Error] %s' % error)
         client.deactivate()
@@ -77,7 +77,7 @@ def handshake(client):
         client.on_connect(client)
 
 
-class WsService(Service):
+class WebSocketService(Service):
 
     def __init__(self, on_connect=debug_on_connect, 
             on_disconnect=debug_on_disconnect, on_input=debug_on_input,
@@ -85,8 +85,9 @@ class WsService(Service):
         ## This is plain ugly, but we need to hijack client events for the
         ## first exchange in order to carry out the WebSocket handshake.
         ## After that, we can treat it like an established client.
-        Service.__init__(self, tmp_on_connect, tmp_on_disconnect, handshake,
-            port, address)
+        Service.__init__(self, on_connect=tmp_on_connect,
+            on_disconnect=tmp_on_disconnect, on_input=handshake,
+            port=port, address=address)
         self.active_on_connect = on_connect
         self.active_on_input = on_input
         self.active_on_disconnect = on_disconnect

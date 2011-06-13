@@ -31,13 +31,9 @@ class WsClient(Client):
     def raw_send(self, data):
         if data:
             self.send_buffer += data
-            if not self.has_output:            
-                self.has_output = True
-                self.server._request_send(self)
+            self.server._request_send(self)
     
     def send(self, data):
         if data:
-            self.send_buffer += '\x00' + data.encode('utf-8') + '\xFF'
-            if not self.has_output:            
-                self.has_output = True
-                self.server._request_send(self)        
+            self.send_buffer += '\x00' + data + '\xFF'
+            self.server._request_send(self)        

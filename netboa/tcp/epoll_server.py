@@ -75,7 +75,7 @@ class EpollServer(object):
     def poll(self):
         if self.drop_queue:
             for fileno in tuple(self.drop_queue):
-                if not self.clients[fileno].has_output: 
+                if not self.clients[fileno].has_output(): 
                     self._drop_client_by_fileno(fileno)
         events = self.epoll.poll(.001)
         for fileno, event in events:

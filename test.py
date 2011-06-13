@@ -36,6 +36,8 @@ http = HttpService(port=7779)
 
 ## Create our server
 server = Server((service, telnet, websocket, http))
+#server = Server((websocket, http))
+
 
 print '--> Starting Server.  Press CTRL-C to exit.'
 while True:

@@ -57,13 +57,13 @@ def parse_request(request):
     if method not in METHODS:
        raise NetboaHttpBadRequest('Unknown method: %s' % method) 
     req['method'] = method
-    uri = items[1]
-    if uri.startswith('/'):
-        uri = uri[1:]
-    req['uri'] = uri
+    req['uri'] = items[1].lstrip('/')
     req['version'] = items[2]
     for line in lines:
-        key, value = line.split(':\x20', 1)
+        items = line.split(':\x20', 1)
+        if len(items) != 2:
+            raise NetboaHttpBadRequest('Malformed header parameter.')        
+        key, value = items
         req[key.lower()] = value
     req['payload'] = payload.rstrip('\r\n')
     return req

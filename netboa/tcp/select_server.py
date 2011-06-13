@@ -23,7 +23,7 @@ from netboa.tcp.tcp_error import NetboaConnectionLost
 
 
 if sys.platform == 'win32':
-    MAX_CONNECTIONS = 512
+    MAX_CONNECTIONS = 500
 else:
     MAX_CONNECTIONS = 1000
 
@@ -68,7 +68,8 @@ class SelectServer(object):
             del client.recv_target
 
     def _request_send(self, client):
-        self.senders.append(client)
+        if client not in self.senders:
+            self.senders.append(client)
 
     def _clear_send(self, client):
         if client in self.senders:
@@ -77,14 +78,14 @@ class SelectServer(object):
     def poll(self):
         if self.drop_queue:
             for client in tuple(self.drop_queue):
-                if not client.has_output:
+                if not client.has_output():
                     self._drop_client(client)
         readers, senders, errors = select.select(self.services + self.clients, 
             self.senders, [], .005)
         for reader in readers:
             if reader in self.services:
                 if len(self.clients) < MAX_CONNECTIONS:
-                    client = reader.create_client()                               
+                    client = reader.create_client()                            
                     self._add_client(client) 
             else:
                 try:

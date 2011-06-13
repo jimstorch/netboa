@@ -57,7 +57,7 @@ def http_on_input(client):
             if not os.path.isfile(path):
                 respond_404(client)
             else:
-                #print('[HTTP] GET %s' % path)
+                print('[HTTP] GET %s' % path)
                 content = open(path, 'rb').read()
                 respond_200(client, content_type,  filename, len(content))
                 client.send(content)

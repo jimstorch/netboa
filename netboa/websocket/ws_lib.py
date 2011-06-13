@@ -13,24 +13,33 @@
 
 from netboa.websocket.ws_error import NetboaWsBadRequest
 
+
 def parse_request(request):
     req = {}
-    lines = request.split('\r\n')
+    segments = request.split('\r\n\r\n', 1)
+    if len(segments) != 2:
+        raise NetboaWsBadRequest('Empty or malformed WebSocket request.')
+    header, payload = segments
+    lines = header.split('\r\n')
     if not lines:
-        raise NetboaWsBadRequest('Empty Header.')
+        raise NetboaWsBadRequest('Missing WebSocket request header.')
     line = lines.pop(0)
     items = line.split('\x20')
-    print items
-#    if len(items) != 3:
-#        raise NetboaWsBadRequest('Method line is not 3 arguments.')
+    if len(items) != 3:
+        raise NetboaWsBadRequest('Malformed WebSocket request method.')
     req['method'] = items[0]
-    uri = items[1]
-    if uri.startswith('/'):
-        uri = uri[1:]
-    req['uri'] = uri
+    req['uri'] = items[1].lstrip('/')
     req['version'] = items[2]
     for line in lines:
         parts = line.split(':\x20', 1)
         if len(parts) == 2:
             req[parts[0].lower()] = parts[1]
+    req['payload'] = payload
+
+    ## Guess the version number
+    if 'version' not in req:
+        if 'sec-websocket-key2' in req:
+            req['version'] = 'draft76'
+        else:
+            req['version'] = 'draft75'
     return req
