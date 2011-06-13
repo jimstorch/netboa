@@ -11,4 +11,4 @@
 #   under the License.
 #------------------------------------------------------------------------------
 
-from netboa.websocket.ws_service import WsService as WebSocketService
+from netboa.websocket.ws_service import WebSocketService

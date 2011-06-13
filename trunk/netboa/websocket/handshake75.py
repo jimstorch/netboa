@@ -14,6 +14,16 @@
 from netboa.websocket.ws_error import NetboaWsBadRequest
 
 
+##  Sample Request
+#   GET /demo HTTP/1.1\r\n
+#   Upgrade: WebSocket\r\n
+#   Connection: Upgrade\r\n
+#   Host: example.com\r\n
+#   Origin: http://example.com\r\n
+#   WebSocket-Protocol: sample\r\n
+#   \r\n
+
+
 RESPONSE75 = (
     'HTTP/1.1 101 Web Socket Protocol Handshake\r\n'
     'Upgrade: WebSocket\r\n'
@@ -24,6 +34,9 @@ RESPONSE75 = (
     )
 
 def parse_request75(request):
+
+    print repr(request)
+
     req = {}
     segments = request.split('\r\n\r\n', 1)
     if len(segments) != 2:
@@ -37,9 +50,7 @@ def parse_request75(request):
     if len(items) != 3:
         raise NetboaWsBadRequest('Malformed ws request method.')
     req['method'] = items[0]
-    uri = items[1]
-    if uri.startswith('/'):
-        uri = uri[1:]
+    uri = items[1].lstrip('/')
     req['uri'] = uri
     req['version'] = items[2]
     for line in lines:
@@ -48,6 +59,16 @@ def parse_request75(request):
             req[parts[0].lower()] = parts[1]
     req['payload'] = payload.rstrip('\r\n')
     return req    
+
+
+
+
+
+
+
+
+
+
 
 def handshake75(client):
     request = client.get_input()
@@ -63,7 +84,7 @@ def handshake75(client):
     port = client.service.port
     ## WebSockets are very fussy; localhost:port != 127.0.0.1:port
     response = RESPONSE75 % (origin, domain, port)
-    #print response
+    print response
     client.raw_send(response) 
     
     
