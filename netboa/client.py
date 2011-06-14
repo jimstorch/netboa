@@ -73,9 +73,11 @@ class Client(object):
         try:
             sent = self.sock.send(self.send_buffer)
         except socket.error:
+            print "[client] SOCKET ERROR ON SEND"
             raise NetboaConnectionLost()
         if sent < size:
             self.send_buffer = self.send_buffer[sent:]
+            print "[client] PARTIAL SEND"
         else:
             self.send_buffer = ''
             self.server._clear_send(self)
@@ -84,9 +86,11 @@ class Client(object):
         try:
             data = self.sock.recv(2048)
         except socket.error:
+            print "[client] SOCKET ERROR ON READ" 
             raise NetboaConnectionLost()
         size = len(data)
         if size == 0:
+            print "[client] NO DATA ON READ"
             raise NetboaConnectionLost()
         self.last_input_time = time.time()
         self.recv_buffer += data

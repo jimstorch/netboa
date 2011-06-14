@@ -50,7 +50,7 @@ def debug_on_disconnect(client):
 def debug_on_input(client):
     print('[WebSocket] Input from %s' % client.origin)
     print repr(client.get_input())
-    client.send('Message Received')
+    #client.send('Message Received')
 
 def tmp_on_connect(client):
     """Do nothing, pre-handshake placeholder."""
@@ -75,7 +75,7 @@ def handshake(client):
         client.on_input = client.service.active_on_input
         client.on_disconnect = client.service.active_on_disconnect
         client.on_connect(client)
-
+        pass
 
 class WebSocketService(Service):
 

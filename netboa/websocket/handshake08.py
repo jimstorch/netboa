@@ -58,7 +58,7 @@ def handshake08(client):
         raise NetboaWsBadRequest('Malformed origin in WebSocket request.')    
     domain = parts[0]
     port = client.service.port
-    response = RESPONSE76 % (origin, domain, port, hashed)
+    response = RESPONSE08 % (origin, domain, port, hashed)
     print repr(response)
     client.send(response)
 

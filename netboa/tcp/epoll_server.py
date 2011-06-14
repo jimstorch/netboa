@@ -52,6 +52,7 @@ class EpollServer(object):
         client.on_connect(client)
 
     def request_drop(self, client):
+        #print "[epoll] CLIENT DROP REQUESTED"
         self.drop_queue.add(client.fileno())
 
     def _drop_client_by_fileno(self, fileno):
@@ -84,19 +85,26 @@ class EpollServer(object):
                     client = self.services[fileno].create_client()
                     self._add_client(client)
                 else:
-                    print "Max connections"
-            elif event & select.EPOLLIN:
-                try:
-                    self.clients[fileno]._socket_recv()
-                except NetboaConnectionLost:
-                    self._drop_client_by_fileno(fileno)
-            elif event & select.EPOLLOUT:
-                try:
-                    self.clients[fileno]._socket_send()
-                except NetboaConnectionLost:
-                    self._drop_client_by_fileno(fileno)                   
-            elif event & select.EPOLLHUP:
-                if fileno in self.clients:
-                    self._drop_client_by_fileno(fileno)
+                    print "[epoll] MAX CONNECTIONS"
+            else:
+
+                if event & select.EPOLLOUT:
+                    try:
+                        self.clients[fileno]._socket_send()
+                    except NetboaConnectionLost:
+                        print "[epoll] COULD NOT SEND FROM SOCKET"
+                        self._drop_client_by_fileno(fileno)   
+
+                if event & select.EPOLLHUP:
+                    if fileno in self.clients:
+                        print "[epoll] Hang up"
+                        self._drop_client_by_fileno(fileno)
+                
+                elif event & select.EPOLLIN:
+                    try:
+                        self.clients[fileno]._socket_recv()
+                    except NetboaConnectionLost:
+                        print "[epoll] COULD NOT READ SOCKET"
+                        self._drop_client_by_fileno(fileno)
 
           

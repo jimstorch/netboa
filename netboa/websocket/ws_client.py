@@ -28,7 +28,7 @@ class WsClient(Client):
         self.recv_buffer = ''
         return data.lstrip('\x00').rstrip('\xff')
 
-    def raw_send(self, data):
+    def send_raw(self, data):
         if data:
             self.send_buffer += data
             self.server._request_send(self)
