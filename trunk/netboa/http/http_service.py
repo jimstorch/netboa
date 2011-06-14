@@ -26,11 +26,11 @@ from netboa.http.http_lib import respond_404
 from netboa.http.http_lib import respond_501
 
 def on_connect(client):
-    print('[HTTP] New Connection from %s' % client.origin) 
+    #print('[HTTP] New Connection from %s' % client.origin) 
     pass
 
 def on_disconnect(client):
-    print('[HTTP] Lost Connection from %s' % client.origin)
+    #print('[HTTP] Lost Connection from %s' % client.origin)
     pass 
 
 def debug_on_input(client):

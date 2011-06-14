@@ -61,15 +61,6 @@ def parse_request75(request):
     return req    
 
 
-
-
-
-
-
-
-
-
-
 def handshake75(client):
     request = client.get_input()
     req = parse_request75(request)
@@ -85,6 +76,6 @@ def handshake75(client):
     ## WebSockets are very fussy; localhost:port != 127.0.0.1:port
     response = RESPONSE75 % (origin, domain, port)
     print response
-    client.raw_send(response) 
+    client.send_raw(response) 
     
     

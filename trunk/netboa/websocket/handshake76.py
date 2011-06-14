@@ -17,7 +17,6 @@ import hashlib
 from netboa.websocket.ws_error import NetboaWsBadRequest
 from netboa.websocket.ws_lib import parse_request
 
-
 ## Sample request
 #   GET /demo HTTP/1.1\r\n
 #   Host: example.com\r\n
@@ -30,7 +29,6 @@ from netboa.websocket.ws_lib import parse_request
 #   \r\n 
 #   ^n:ds[4U
 
-
 RESPONSE76 = (
     'HTTP/1.1 101 WebSocket Protocol Handshake\r\n'
     'Upgrade: WebSocket\r\n'
@@ -39,8 +37,21 @@ RESPONSE76 = (
     'Sec-WebSocket-Location: ws://%s:%d/\r\n'
     'Sec-WebSocket-Protocol: *\r\n'
     '\r\n'
-    '%s'
     )
+
+def get_word(key):
+    digits=''
+    spaces=0
+    for char in key:
+        if char.isdigit():
+            digits += char
+        elif char == '\x20':
+            spaces += 1
+    try:
+        word = int(digits) / spaces
+    except ValueError:
+        raise NetboaWsBadRequest('Sec-WebSockets-Key(s) bad integers.')   
+    return word 
 
 def handshake76(client):
     request = client.get_input()
@@ -61,36 +72,14 @@ def handshake76(client):
     key2 = req.get('sec-websocket-key1', None)
     if not key1 or not key2:
         raise NetboaWsBadRequest('Missing Sec-WebSocket-Key(s) in request.')
-    key1_digits = ''
-    key1_spaces = 0
-    for char in key1:
-        if char.isdigit():
-            key1_digits += char
-        elif char == '\x20':
-            key1_spaces += 1
-    key2_digits = ''
-    key2_spaces = 0
-    for char in key2:
-        if char.isdigit():
-            key2_digits += char
-        elif char == '\x20':
-            key2_spaces += 1
-    if not key1_digits or not key2_digits:
-        raise NetboaWsBadRequest('Sec-WebSocket-Key(s) missing digits.')     
-
-    if not key1_spaces or not key2_spaces:
-        raise NetboaWsBadRequest('Sec-WebSocket-Key(s) missing spaces.')      
-    try:
-        word1 = int(key1_digits) / key1_spaces
-        word2 = int(key2_digits) / key2_spaces
-    except ValueError:
-        raise NetboaWsBadRequest('Sec-WebSockets-Key(s) bad integers.')       
+    word1 = get_word(key1)
+    word2 = get_word(key2)    
     salt = req.get('payload', None)
     if not salt:
-        raise NetboaWsBadRequest('WebSocket request missing salt.')    
-    hashed = hashlib.md5(struct.pack('>II8s', word1, word2, salt)).digest()
+        raise NetboaWsBadRequest('WebSocket request missing salt.')
+    token = hashlib.md5(struct.pack(">II", word1, word2) + salt).digest()
     port = client.service.port
-    response = RESPONSE76 % (origin, domain, port, hashed)
-    print repr(response)
-    client.send(response) 
-   
+    response = RESPONSE76 % (origin, domain, port)
+    print repr(response + token)
+    client.send_raw(response + token)
+

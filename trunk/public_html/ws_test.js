@@ -15,7 +15,7 @@ var ws = new WebSocket("ws://localhost:7778");
 
 ws.onopen = function ()
     {
-    ws.send("CONNECTED");
+    alert("WebSocket.onopen");
     };
 
 ws.onmessage = function (evt)
@@ -25,4 +25,5 @@ ws.onmessage = function (evt)
 
 ws.onclose = function()
     {
+    alert("WebSocket.onclose");
     };

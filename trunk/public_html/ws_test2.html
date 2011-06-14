@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Web Socket Example</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<script>
+
+console.log('Start');
+
+var wsUrl = "ws://localhost:7778";
+var websocket = new WebSocket(wsUrl);
+
+console.log('Point A');
+
+
+websocket.onopen = function (evt) { onOpen(evt) };
+websocket.onclose = function (evt) { onClose(evt) };
+websocket.onmessage = function (evt) { onMessage(evt) };
+websocket.onerror = function (evt) { onError(evt) };
+
+console.log('Point B');
+
+function onOpen(evt) {
+    console.log("Connected to WebSocket server.");
+
+    //websocket.send("HTML5 WebSocket rocks!");
+}
+function onClose(evt) { console.log("Disconnected"); }
+function onMessage(evt) {
+    console.log('Retrieved data from server: ' + evt.data);
+
+    // Update UI...
+}
+function onError(evt) { console.log('Error occured: ' + evt.data); }
+
+console.log('Point C');
+
+</script>
+
+</body>
+</html>
