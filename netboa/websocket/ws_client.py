@@ -13,6 +13,7 @@
 
 from netboa.client import Client
 
+
 class WsClient(Client):
     
     def __init__(self, sock, address, port):

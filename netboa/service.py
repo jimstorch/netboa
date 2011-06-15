@@ -16,6 +16,7 @@ import socket
 
 from netboa.client import Client
 
+
 def debug_on_connect(client):
     print('[Base Service] New connection from %s.' % client.origin)
   

@@ -3,10 +3,19 @@
 <head>
     <title>Web Socket Example</title>
     <meta charset="UTF-8">
+    <script type="text/javascript" src="contrib/jquery-1.6.1.min.js"></script>
     <script type="text/javascript" src="ws_test.js"></script>
 </head>
 <body>
-    <button onclick="ws.send('POKE')">POKE!</button>
+
+    <h3>DISCONNECTED</h3>
+    <button onclick="ws.send('POKE')">Connect</button><br />
+    <button onclick="ws.send('POKE')" disabled="disabled">Disconnect</button><br />
+    <br />
+
+    <button onclick="ws.send('POKE')" disabled="disabled">POKE!</button><br />
+    <button onclick="ws.send('PUNCH')" disabled="disabled">PUNCH!</button><br />
+    <button onclick="ws.send('JAB')" disabled="disabled">JAB!</button><br />
 </body>
 </html>
 

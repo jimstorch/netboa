@@ -19,18 +19,6 @@ from netboa.websocket.ws_error import NetboaWsBadRequest
 from netboa.websocket.ws_lib import parse_request
 
 
-##  Sample Request
-#   GET /chat HTTP/1.1\r\n
-#   Host: server.example.com\r\n
-#   Upgrade: websocket\r\n
-#   Connection: Upgrade\r\n
-#   Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n
-#   Sec-WebSocket-Origin: http://example.com\r\n
-#   Sec-WebSocket-Protocol: chat, superchat\r\n
-#   Sec-WebSocket-Version: 8\r\n
-#   \r\n
-
-
 HANDSHAKE08_GUID = u'258EAFA5-E914-47DA-95CA-C5AB0DC85B11'
 
 RESPONSE08 = (
@@ -49,24 +37,22 @@ def handshake08(client):
     print repr(req)
     origin = req.get('origin', None)
     if not origin:
-        raise NetboaWsBadRequest('Missing origin in WebSocket request.')    
+        raise NetboaWsBadRequest('[08] WebSocket request missing origin.')    
     host = req.get('host', None)
     if not host:
-        raise NetboaWsBadRequest('Missing host in WebSocket request.')   
-    parts = host.split(':')
-    if len(parts) != 2:
-        raise NetboaWsBadRequest('Malformed origin in WebSocket request.')    
-    domain = parts[0]
+        raise NetboaWsBadRequest('[08] WebSocket request missing host.')   
+    domain = host.split(':')[0]
     port = client.service.port
-    response = RESPONSE08 % (origin, domain, port, hashed)
+    key = req.get('sec-websocket-key', None)
+    if not key:
+        raise NetboaWsBadRequest('[08] WebSocket request missing key.')
+    hashed = hashlib.sha1(unicode(key + HANDSHAKE08_GUID)).digest()
+    token = base64.b64encode(hashed)
+    response = RESPONSE08 % (origin, domain, port, token)
     print repr(response)
-    client.send(response)
+    client.send_raw(response)
 
 
-def keygen08(request_key):
-    combo = unicode(request_key + HANDSHAKE08_GUID)
-    hashed = hashlib.sha1(combo).digest()
-    accept_key = base64.b64encode(hashed)
-    return accept_key
+
  
    
