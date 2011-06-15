@@ -15,7 +15,6 @@ var websocket = new WebSocket(wsUrl);
 
 console.log('Point A');
 
-
 websocket.onopen = function (evt) { onOpen(evt) };
 websocket.onclose = function (evt) { onClose(evt) };
 websocket.onmessage = function (evt) { onMessage(evt) };
@@ -25,16 +24,20 @@ console.log('Point B');
 
 function onOpen(evt) {
     console.log("Connected to WebSocket server.");
-
     //websocket.send("HTML5 WebSocket rocks!");
-}
-function onClose(evt) { console.log("Disconnected"); }
+    }
+
+function onClose(evt) {
+    console.log("Disconnected");
+    }
+
 function onMessage(evt) {
     console.log('Retrieved data from server: ' + evt.data);
+    }
 
-    // Update UI...
-}
-function onError(evt) { console.log('Error occured: ' + evt.data); }
+function onError(evt) {
+    console.log('Error occured: ' + evt.data);
+    }
 
 console.log('Point C');
 

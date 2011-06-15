@@ -25,12 +25,13 @@ from netboa.http.http_lib import respond_400
 from netboa.http.http_lib import respond_404
 from netboa.http.http_lib import respond_501
 
+
 def on_connect(client):
     #print('[HTTP] New Connection from %s' % client.origin) 
     pass
 
 def on_disconnect(client):
-    #print('[HTTP] Lost Connection from %s' % client.origin)
+    #print('[HTTP] Lost Connection with %s' % client.origin)
     pass 
 
 def debug_on_input(client):
@@ -56,6 +57,7 @@ def http_on_input(client):
             path = os.path.join('./public_html', filename)
             if not os.path.isfile(path):
                 respond_404(client)
+                print('[HTTP] 404 NOT FOUND: %s' % path) 
             else:
                 print('[HTTP] GET %s' % path)
                 content = open(path, 'rb').read()

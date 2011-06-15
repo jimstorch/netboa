@@ -11,27 +11,6 @@
 #   under the License.
 #------------------------------------------------------------------------------
 
-#    Weirdness with local connections  
-#    --------------------------------
-#
-#    In the Chrome address bar, you can specify: 
-
-#        http://127.0.0.1:http_port
-#        http://machine_name:http_port
-#        http://localhost:http_port
-#
-#    and all will work because of some juggling performed in handshake75 to
-#    match the Response host name to the WebSocket Request.
-#
-#    However, the Javascript part is kinda screwy.  
-
-#        If I use 'ws://127.0.0.1:ws_port' it works.
-#        If I use 'ws://machine_name:ws_port', it works.
-#        If I use 'ws://localhost:ws_port', it doesn't even try to connect.
-#
-#    Apparently, this is a bug with Chrome & Chromium under Linux.
-
-
 import sys
 import socket
 
@@ -41,17 +20,6 @@ from netboa.websocket.ws_error import NetboaWsBadRequest
 from netboa.websocket.handshake76 import handshake76
 
 
-def debug_on_connect(client):
-    print('[WebSocket] New Connection from %s' % client.origin)
-
-def debug_on_disconnect(client):
-    print('[WebSocket] Lost Connection from %s' % client.origin) 
-
-def debug_on_input(client):
-    print('[WebSocket] Input from %s' % client.origin)
-    print repr(client.get_input())
-    #client.send('Message Received')
-
 def tmp_on_connect(client):
     """Do nothing, pre-handshake placeholder."""
     print('[Pre-Negotiated WebSocket] New Connection from %s' % client.origin)
@@ -59,12 +27,12 @@ def tmp_on_connect(client):
 
 def tmp_on_disconnect(client):
     """Do nothing, pre-handshake placeholder."""
-    print('[Pre-Negotiated WebSocket] Lost Connection from %s' % client.origin) 
+    print('[Pre-Negotiated WebSocket] Lost Connection with %s' % client.origin) 
     pass 
 
 def handshake(client):
     """Negotiate a persistent WebSocket with the browser -- OR DIE!"""
-    print('[WebSocket Handshake] Input from %s' % client.origin)
+    print('[WebSocket Handshake] Request from %s' % client.origin)
     try:
         handshake76(client)
     except NetboaWsBadRequest, error:
@@ -76,6 +44,19 @@ def handshake(client):
         client.on_disconnect = client.service.active_on_disconnect
         client.on_connect(client)
         pass
+
+def debug_on_connect(client):
+    print('[WebSocket] New Connection from %s' % client.origin)
+
+def debug_on_disconnect(client):
+    print('[WebSocket] Lost Connection with %s' % client.origin) 
+
+def debug_on_input(client):
+    print('[WebSocket] Input from %s' % client.origin)
+    msg = client.get_input()
+    print repr(msg)
+    client.send('Message Received: %s' % msg)
+
 
 class WebSocketService(Service):
 

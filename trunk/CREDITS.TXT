@@ -1,0 +1,6 @@
+
+The file 'public_html/contrib/jquery-1.6.1.min.js' is from JQuery, the 
+excellent library for Javascript.  For more information please visit
+www.jquery.com.
+
+
