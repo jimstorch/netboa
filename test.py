@@ -23,22 +23,23 @@
 
 
 from netboa import Server
-from netboa import Service
+from netboa import verbosity
 from netboa.http import HttpService
 from netboa.websocket import WebSocketService
-from netboa.telnet import TelnetService
+
 
 ## Create our services
-service = Service(port=7776)
-telnet = TelnetService(port=7777)
+http = HttpService(port=7777)
 websocket = WebSocketService(port=7778)
-http = HttpService(port=7779)
+
 
 ## Create our server
-server = Server((service, telnet, websocket, http))
-#server = Server((websocket, http))
+server = Server((http, websocket))
+server.verbosity = verbosity.INFO
 
 
+print '--> HTTP Service running on port %d' % http.port
+print '--> WebSocket Service running on port %d' % websocket.port
 print '--> Starting Server.  Press CTRL-C to exit.'
 while True:
     server.poll()

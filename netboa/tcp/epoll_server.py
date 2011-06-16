@@ -19,6 +19,7 @@ This is the default server for Linux.
 import select
 import time
 
+from netboa import verbosity
 from netboa.tcp.tcp_error import NetboaConnectionLost
 
 
@@ -33,6 +34,11 @@ class EpollServer(object):
         self.drop_queue = set()
         if service is not None:    
             self.add_service(service)
+        self.verbosity = verbosity.ERROR
+
+    def vprint(self, msg, level=verbosity.INFO):
+        if level <= self.verbosity:
+            print(msg)
 
     def add_service(self, service):
         if hasattr(service, '__iter__'):
@@ -52,7 +58,7 @@ class EpollServer(object):
         client.on_connect(client)
 
     def request_drop(self, client):
-        #print "[epoll] CLIENT DROP REQUESTED"
+        self.vprint("[epoll] Client drop requested", verbosity.DEBUG)
         self.drop_queue.add(client.fileno())
 
     def _drop_client_by_fileno(self, fileno):
@@ -62,10 +68,6 @@ class EpollServer(object):
         del self.clients[fileno]
         if fileno in self.drop_queue:
             self.drop_queue.remove(fileno)
-        if hasattr(client, 'send_target'):
-            del client.send_target
-        if hasattr(client, 'recv_target'):
-            del client.recv_target
 
     def _request_send(self, client):
         self.epoll.modify(client.fileno(), select.EPOLLIN | select.EPOLLOUT)
@@ -85,26 +87,28 @@ class EpollServer(object):
                     client = self.services[fileno].create_client()
                     self._add_client(client)
                 else:
-                    print "[epoll] MAX CONNECTIONS"
+                    self.vprint("[epoll] MAX CONNECTIONS", verbosity.WARN)
             else:
 
                 if event & select.EPOLLOUT:
                     try:
                         self.clients[fileno]._socket_send()
                     except NetboaConnectionLost:
-                        print "[epoll] COULD NOT SEND FROM SOCKET"
+                        self.vprint("[epoll] Could not write socket",
+                            verbosity.ERROR)
                         self._drop_client_by_fileno(fileno)   
 
                 if event & select.EPOLLHUP:
                     if fileno in self.clients:
-                        print "[epoll] Hang up"
+                        self.vprint("[epoll] Socket hung-up", verbosity.WARN)
                         self._drop_client_by_fileno(fileno)
                 
                 elif event & select.EPOLLIN:
                     try:
                         self.clients[fileno]._socket_recv()
                     except NetboaConnectionLost:
-                        print "[epoll] COULD NOT READ SOCKET"
+                        self.vprint("[epoll] Could not read socket", 
+                            verbosity.DEBUG)
                         self._drop_client_by_fileno(fileno)
 
           

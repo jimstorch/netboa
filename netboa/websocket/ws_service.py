@@ -14,6 +14,7 @@
 import sys
 import socket
 
+from netboa import verbosity
 from netboa.service import Service
 from netboa.websocket.ws_client import WsClient
 from netboa.websocket.ws_error import NetboaWsBadRequest
@@ -22,21 +23,24 @@ from netboa.websocket.handshake76 import handshake76
 
 def tmp_on_connect(client):
     """Do nothing, pre-handshake placeholder."""
-    print('[Pre-Negotiated WebSocket] New Connection from %s' % client.origin)
+    client.server.vprint('[Pre-Negotiated WebSocket] New Connection from %s'
+        % client.origin, verbosity.DEBUG )
     pass 
 
 def tmp_on_disconnect(client):
     """Do nothing, pre-handshake placeholder."""
-    print('[Pre-Negotiated WebSocket] Lost Connection with %s' % client.origin) 
+    client.server.vprint('[Pre-Negotiated WebSocket] Lost Connection with %s'
+        % client.origin, verbosity.DEBUG) 
     pass 
 
 def handshake(client):
     """Negotiate a persistent WebSocket with the browser -- OR DIE!"""
-    print('[WebSocket Handshake] Request from %s' % client.origin)
+    client.server.vprint('[WebSocket Handshake] Request from %s' % 
+        client.origin, verbosity.DEBUG)
     try:
         handshake76(client)
     except NetboaWsBadRequest, error:
-        print('[WebSocket Error] %s' % error)
+        client.server.vprint('[WebSocket Error] %s' % error, verbosity.ERROR)
         client.deactivate()
     else:
         client.on_connect = client.service.active_on_connect
@@ -46,15 +50,18 @@ def handshake(client):
         pass
 
 def debug_on_connect(client):
-    print('[WebSocket] New Connection from %s' % client.origin)
+    client.server.vprint('[WebSocket] New Connection from %s' % 
+        client.origin, verbosity.INFO)
 
 def debug_on_disconnect(client):
-    print('[WebSocket] Lost Connection with %s' % client.origin) 
+    print('[WebSocket] Lost Connection with %s' % client.origin, 
+        verbosity.INFO) 
 
 def debug_on_input(client):
-    print('[WebSocket] Input from %s' % client.origin)
+    client.server.vprint('[WebSocket] Input from %s' % client.origin,
+        verbosity.DEBUG)
     msg = client.get_input()
-    print repr(msg)
+    #print repr(msg)
     client.send('Message Received: %s' % msg)
 
 

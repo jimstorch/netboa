@@ -52,9 +52,7 @@ def get_word(key):
 
 def handshake76(client):
     request = client.get_input()
-    #print repr(request)
     req = parse_request(request)
-    #print repr(req)
     origin = req.get('origin', None)
     if not origin:
         raise NetboaWsBadRequest('[76] WebSocket request missing origin.')    
@@ -76,6 +74,5 @@ def handshake76(client):
     token = hashlib.md5(word1 + word2 + salt).digest()  
     port = client.service.port
     response = RESPONSE76 % (origin, domain, port, token)
-    #print repr(response)
     client.send_raw(response)
 
