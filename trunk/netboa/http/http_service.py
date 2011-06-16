@@ -15,6 +15,7 @@ import os
 import sys
 import socket
 
+from netboa import verbosity
 from netboa.service import Service
 from netboa.http.http_client import HttpClient
 from netboa.http.http_error import NetboaHttpBadRequest
@@ -27,25 +28,26 @@ from netboa.http.http_lib import respond_501
 
 
 def on_connect(client):
-    #print('[HTTP] New Connection from %s' % client.origin) 
+    client.server.vprint('[HTTP] New Connection from %s' % client.origin,
+        verbosity.DEBUG) 
     pass
 
 def on_disconnect(client):
-    #print('[HTTP] Lost Connection with %s' % client.origin)
+    client.server.vprint('[HTTP] Lost Connection with %s' % client.origin,
+        verbosity.DEBUG)
     pass 
 
 def debug_on_input(client):
-    print('[HTTP] Input from %s' % client.origin)
-    print repr(client.get_input())
+    client.server.vprint('[HTTP] Request from %s' % client.origin,
+        verbosity.DEBUG)
 
 def http_on_input(client):
     request = client.get_input()
     try:
         req = parse_request(request)
-        #print request
-        #print repr(req)
     except NetboaHttpBadRequest, error:
         respond_400(client, error)
+        client.server.vprint('[HTTP] 400 Bad Request Error', verbosity.ERROR)
     else:
         if req['method'] == 'GET':
             uri = req['uri']
@@ -57,14 +59,17 @@ def http_on_input(client):
             path = os.path.join('./public_html', filename)
             if not os.path.isfile(path):
                 respond_404(client)
-                print('[HTTP] 404 NOT FOUND: %s' % path) 
+                client.server.vprint('[HTTP] 404 NOT FOUND: %s' % path,
+                    verbosity.WARN) 
             else:
-                print('[HTTP] GET %s' % path)
+                client.server.vprint('[HTTP] GET %s' % path, verbosity.INFO)
                 content = open(path, 'rb').read()
                 respond_200(client, content_type,  filename, len(content))
                 client.send(content)
         else:
             respond_501(client)
+            client.server.vprint('[HTTP] 501 Not Implemented Error', 
+                verbosity.ERROR)
     finally:
         client.deactivate()
 

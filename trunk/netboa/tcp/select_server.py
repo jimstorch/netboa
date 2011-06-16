@@ -19,6 +19,7 @@ This is the default server for non-Linux environments.
 import sys
 import select
 
+from netboa import verbosity
 from netboa.tcp.tcp_error import NetboaConnectionLost
 
 
@@ -36,6 +37,12 @@ class SelectServer(object):
         self.drop_queue = set()
         if service is not None:
             self.add_service(service)
+        self.verbosity = verbosity.ERROR
+
+    def vprint(self, msg, level=verbosity.INFO):
+        if level >= self.verbosity:
+            print(msg)
+
 
     def add_service(self, service):
         if getattr(service, '__iter__', False):
@@ -53,6 +60,7 @@ class SelectServer(object):
         client.on_connect(client)
 
     def request_drop(self, client):
+        self.vprint("[select] Client drop requested", verbosity.DEBUG)
         self.drop_queue.add(client)
 
     def _drop_client(self, client):
@@ -62,10 +70,6 @@ class SelectServer(object):
             self.senders.remove(client)
         if client in self.drop_queue:
             self.drop_queue.remove(client)
-        if hasattr(client, 'send_target'):
-            del client.send_target
-        if hasattr(client, 'recv_target'):
-            del client.recv_target
 
     def _request_send(self, client):
         if client not in self.senders:
@@ -86,15 +90,21 @@ class SelectServer(object):
             if reader in self.services:
                 if len(self.clients) < MAX_CONNECTIONS:
                     client = reader.create_client()                            
-                    self._add_client(client) 
+                    self._add_client(client)
+                else:
+                    self.vprint("[select] MAX CONNECTIONS", verbosity.WARN) 
             else:
                 try:
                     reader._socket_recv()
                 except NetboaConnectionLost:
+                    self.vprint("[select] Could not read socket", 
+                        verbosity.DEBUG)
                     self._drop_client(reader)
         for sender in senders:
             try:
                 sender._socket_send()    
             except NetboaConnectionLost:
+                self.vprint("[select] Could not write socket",
+                    verbosity.ERROR)            
                 self._drop_client(sender)
 
