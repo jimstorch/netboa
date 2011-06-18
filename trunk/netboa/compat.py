@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-#   netboa/websocket/ws_client.py
+#   netboa/compat.py
 #   Copyright 2011 Jim Storch
 #   Licensed under the Apache License, Version 2.0 (the "License"); you may
 #   not use this file except in compliance with the License. You may obtain a
@@ -11,29 +11,15 @@
 #   under the License.
 #------------------------------------------------------------------------------
 
-from netboa import str_to_bytes
-from netboa import bytes_to_str
-from netboa.client import Client
 
+def str_to_bytes_python2(data):
+    return data
 
-class WsClient(Client):
-    
-    def __init__(self, sock, address, port):
-        Client.__init__(self, sock, address, port)
+def str_to_bytes_python3(data):
+    return data.encode()
 
-    def get_string(self):
-        data = bytes_to_str(self.get_bytes())
-        return data.lstrip('\x00').rstrip('\xff')
+def bytes_to_str_python2(data):
+    return data
 
-    def send_raw(self, data):
-        if type(data) == str:
-            self.send_buffer += str_to_bytes(data)
-        else:
-            self.send_buffer += data
-        self.server._request_send(self)
-    
-    def send(self, data):
-        self.send_raw(b'\x00')
-        self.send_raw(data)
-        self.send_raw(b'\xff')
-       
+def bytes_to_str_python3(data):
+    return data.decode('ascii', 'ignore')

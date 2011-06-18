@@ -35,12 +35,12 @@ websocket = WebSocketService(port=7778)
 
 ## Create our server
 server = Server((http, websocket))
-server.verbosity = verbosity.INFO
+server.verbosity = verbosity.DEBUG
 
 
-print '--> HTTP Service running on port %d' % http.port
-print '--> WebSocket Service running on port %d' % websocket.port
-print '--> Starting Server.  Press CTRL-C to exit.'
+print('--> HTTP Service running on port %d' % http.port)
+print('--> WebSocket Service running on port %d' % websocket.port)
+print('--> Starting Server.  Press CTRL-C to exit.')
 while True:
     server.poll()
     #collect_and_show_garbage() 

@@ -39,7 +39,7 @@ def handshake(client):
         client.origin, verbosity.DEBUG)
     try:
         handshake76(client)
-    except NetboaWsBadRequest, error:
+    except NetboaWsBadRequest as error:
         client.server.vprint('[WebSocket Error] %s' % error, verbosity.ERROR)
         client.deactivate()
     else:
@@ -60,7 +60,7 @@ def debug_on_disconnect(client):
 def debug_on_input(client):
     client.server.vprint('[WebSocket] Input from %s' % client.origin,
         verbosity.DEBUG)
-    msg = client.get_input()
+    msg = client.get_string()
     #print repr(msg)
     client.send('Message Received: %s' % msg)
 

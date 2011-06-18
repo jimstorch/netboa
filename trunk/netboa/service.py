@@ -14,18 +14,21 @@
 import sys
 import socket
 
+from netboa import verbosity
 from netboa.client import Client
 
 
 def debug_on_connect(client):
-    print('[Base Service] New connection from %s.' % client.origin)
+    client.server.vprint('[Base Service] New connection from %s.' % 
+        client.origin, verbosity.DEBUG)
   
 def debug_on_disconnect(client):
-    print('[Base Service] Lost connection to %s.' % client.origin)
+    print('[Base Service] Lost connection to %s.' % client.origin, 
+        verbosity.DEBUG)
 
 def debug_on_input(client):
-    print('[Base Service] Input from %s.' % client.origin)
-    print repr(client.get_input())
+    print('[Base Service] Input from %s.' % client.origin, verbosity.DEBUG)
+    print(repr(client.get_input()))
 
 
 class Service(object):

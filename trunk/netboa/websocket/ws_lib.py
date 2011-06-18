@@ -16,23 +16,23 @@ from netboa.websocket.ws_error import NetboaWsBadRequest
 
 def parse_request(request):
     req = {}
-    segments = request.split('\r\n\r\n', 1)
+    segments = request.split(b'\r\n\r\n', 1)
     if len(segments) != 2:
-        raise NetboaWsBadRequest('Empty or malformed WebSocket request.')
+        raise NetboaWsBadRequest(b'Empty or malformed WebSocket request.')
     header, payload = segments
-    lines = header.split('\r\n')
+    lines = header.split(b'\r\n')
     line = lines.pop(0)
-    items = line.split('\x20',2)
+    items = line.split(b'\x20',2)
     if len(items) != 3:
-        raise NetboaWsBadRequest('Malformed WebSocket request method.')
-    req['method'] = items[0]
-    req['request_uri'] = items[1]
-    req['http_version'] = items[2]
+        raise NetboaWsBadRequest(b'Malformed WebSocket request method.')
+    req[b'method'] = items[0]
+    req[b'request_uri'] = items[1]
+    req[b'http_version'] = items[2]
     for line in lines:
-        parts = line.split(':\x20', 1)
+        parts = line.split(b':\x20', 1)
         assert(len(parts) == 2)
         req[parts[0].lower()] = parts[1]
-    req['payload'] = payload
+    req[b'payload'] = payload
     return req
     ## Guess the version number
 #    if 'version' not in req:

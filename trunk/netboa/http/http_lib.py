@@ -17,128 +17,124 @@ import datetime
 from netboa.http.http_error import NetboaHttpBadRequest
 
 
-METHODS = ('HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 
-    'CONNECT', 'PATCH')
+METHODS = (b'HEAD', b'GET', b'POST', b'PUT', b'DELETE', b'TRACE', b'OPTIONS', 
+    b'CONNECT', b'PATCH')
 
 CONTENT_TYPES = {
-    '.html':'text/html',
-    '.htm':'text/html',
-    '.css':'text/css',
-    '.txt':'text/plain',
-    '.js':'text/javascript',
-    '.png':'image/png',
-    '.jpg':'image/jpeg',
-    '.gif':'image/gif',
-    '.svg':'image/svg+xml',
-    '.svgz':'image/svg+xml\r\nContent-Encoding: gzip',  ## omg hack
-    '.ico':'image/x-icon',
-    '.pdf':'application/pdf',
+    b'.html':b'text/html',
+    b'.htm':b'text/html',
+    b'.css':b'text/css',
+    b'.txt':b'text/plain',
+    b'.js':b'text/javascript',
+    b'.png':b'image/png',
+    b'.jpg':b'image/jpeg',
+    b'.gif':b'image/gif',
+    b'.svg':b'image/svg+xml',
+    b'.svgz':b'image/svg+xml\r\nContent-Encoding: gzip',  ## omg hack
+    b'.ico':b'image/x-icon',
+    b'.pdf':b'application/pdf',
     }
 
 def get_content_type(filename):
     foo, extension = os.path.splitext(filename)
-    return CONTENT_TYPES.get(extension.lower(), 'application/x-unknown')
+    return CONTENT_TYPES.get(extension.lower(), b'application/x-unknown')
 
 def parse_request(request):
     req = {}
-    segments = request.split('\r\n\r\n', 1)
+    segments = request.split(b'\r\n\r\n', 1)
     if len(segments) != 2:
-        raise NetboaHttpBadRequest('Missing header or terminator.') 
+        raise NetboaHttpBadRequest(b'Missing header or terminator.') 
     header = segments[0]
     payload = segments[1] 
-    lines = header.split('\r\n')
+    lines = header.split(b'\r\n')
     if not lines:
-        raise NetboaBadRequest('Empty Header.')
+        raise NetboaBadRequest(b'Empty Header.')
     line = lines.pop(0)
-    items = line.split('\x20')
+    items = line.split(b'\x20')
     if len(items) != 3:
-        raise NetboaHttpBadRequest('Method line is not 3 arguments.')
+        raise NetboaHttpBadRequest(b'Method line is not 3 arguments.')
     method = items[0]
     if method not in METHODS:
-       raise NetboaHttpBadRequest('Unknown method: %s' % method) 
+       raise NetboaHttpBadRequest(b'Unknown method: ' + method) 
     req['method'] = method
-    req['uri'] = items[1].lstrip('/')
+    req['uri'] = items[1].lstrip(b'/')
     req['version'] = items[2]
     for line in lines:
-        items = line.split(':\x20', 1)
+        items = line.split(b':\x20', 1)
         if len(items) != 2:
-            raise NetboaHttpBadRequest('Malformed header parameter.')        
+            raise NetboaHttpBadRequest(b'Malformed header parameter.')        
         key, value = items
         req[key.lower()] = value
-    req['payload'] = payload.rstrip('\r\n')
+    req['payload'] = payload.rstrip(b'\r\n')
     return req
 
 def timestamp():
     """Return the date and time in RFC 1123 format."""
-    return datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%m:%S GMT')
+    return datetime.datetime.utcnow().strftime(
+        '%a, %d %b %Y %H:%m:%S GMT').encode()
 
 def respond_200(client, content_type, filename, content_length):
-    header = (
-        'HTTP/1.0 200 OK\r\n'
-        'Date: %s\r\n'
-        'Content-Type: %s\r\n'
-        'Content-Disposition: filename="%s"\r\n'
-        'Content-Length: %d\r\n'
-        'Connection: close\r\n'
-        '\r\n'
-        )
-    response = header %(timestamp(), content_type, filename, content_length)
+    response = b''.join((
+        b'HTTP/1.0 200 OK\r\n',
+        b'Date: ', timestamp(), b'\r\n',
+        b'Content-Type: ', content_type, b'\r\n',
+        b'Content-Disposition: filename="', filename, b'"\r\n',
+        b'Content-Length: ', str(content_length).encode(), b'\r\n',
+        b'Connection: close\r\n\r\n'
+        ))
     client.send(response)
 
 def respond_400(client, error):
-    response = (
-        'HTTP/1.1 400 Bad Request\r\n'
-        'Date: %s\r\n'
-        'Connection: close\r\n'
-        '\r\n'
-        '<html><head><title>400 Bad Request</title></head>\r\n'
-        '<body>\r\n'
-        '<h1>Bad Request</h1>\r\n'
-        '<p>%s</p>\r\n'
-        '</body></html>\r\n'
-        )        
-    client.send(response % (timestamp(), str(error)))
+    response = b''.join((
+        b'HTTP/1.1 400 Bad Request\r\n',
+        b'Date: ', timestamp(), b'\r\n',
+        b'Connection: close\r\n',
+        b'\r\n',
+        b'<html><head><title>400 Bad Request</title></head>\r\n',
+        b'<body>\r\n',
+        b'<h1>Bad Request</h1>\r\n'
+        b'<p>', error, b'</p>\r\n'
+        b'</body></html>\r\n'
+        ))        
+    client.send(response)
 
 def respond_404(client):
-    response = (
-        'HTTP/1.1 404 Not Found\r\n'
-        'Date: %s\r\n'
-        'Connection: close\r\n'
-        '\r\n'
-        '<html><head><title>404 Not Found</title></head>\r\n'
-        '<body>\r\n'
-        '<h1>Not Found</h1>\r\n'
-        '<p>The requested resource was not found.</p>\r\n'
-        '</body></html>\r\n'
-        )        
-    client.send(response % timestamp())
+    response = b''.join((
+        b'HTTP/1.1 404 Not Found\r\n',
+        b'Date: ', timestamp(), b'\r\n',
+        b'Connection: close\r\n\r\n',
+        b'<html><head><title>404 Not Found</title></head>\r\n',
+        b'<body>\r\n',
+        b'<h1>Not Found</h1>\r\n',
+        b'<p>The requested resource was not found.</p>\r\n',
+        b'</body></html>\r\n'
+        ))        
+    client.send(response)
 
 def respond_501(client):
-    response = (
-        'HTTP/1.1 501 Method Not Implemented\r\n'
-        'Date: %s\r\n'
-        'Connection: close\r\n'
-        '\r\n'
-        '<html><head><title>501 Method Not Implemented</title></head>\r\n'
-        '<body>\r\n'
-        '<h1>Method Not Implemented</h1>\r\n'
-        '</body></html>\r\n'
-        )
-    client.send(response % timestamp())
+    response = b''.join((
+        b'HTTP/1.1 501 Method Not Implemented\r\n',
+        b'Date: ', timestamp(), b'\r\n',
+        b'Connection: close\r\n\r\n',
+        b'<html><head><title>501 Method Not Implemented</title></head>\r\n',
+        b'<body>\r\n',
+        b'<h1>Method Not Implemented</h1>\r\n',
+        b'</body></html>\r\n'
+        ))
+    client.send(response)
 
 def respond_503(client):
-    response =  (
-        'HTTP/1.1 503 Service Temporarily Unavailable\n'
-        'Date: %s\r\n'
-        'Connection: close\r\n'
-        '\r\n'
-        '<html>\r\n'
-        '<head><title>503 Service Temporarily Unavailable</title></head>\r\n'
-        '<body>\r\n'
-        '<h1>Service Temporarily Unavailable</h1>\r\n'
-        '<p>The server is down for maintenance. Please try again later.\r\n'
-        '</p>\r\n'
-        '</body></html>\r\n'
-        )
-    client.send(response % timestamp())
+    response =  b''.join((
+        b'HTTP/1.1 503 Service Temporarily Unavailable\n',
+        b'Date: ', timestamp(), b'\r\n',
+        b'Connection: close\r\n\r\n',
+        b'<html>\r\n',
+        b'<head><title>503 Service Temporarily Unavailable</title></head>\r\n',
+        b'<body>\r\n',
+        b'<h1>Service Temporarily Unavailable</h1>\r\n',
+        b'<p>The server is down for maintenance. Please try again later.\r\n',
+        b'</p>\r\n',
+        b'</body></html>\r\n'
+        ))
+    client.send(response)
 

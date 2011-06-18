@@ -42,27 +42,29 @@ def debug_on_input(client):
         verbosity.DEBUG)
 
 def http_on_input(client):
-    request = client.get_input()
+    request = client.get_bytes()
+    #print(repr(request))
     try:
         req = parse_request(request)
-    except NetboaHttpBadRequest, error:
+    except NetboaHttpBadRequest as error:
         respond_400(client, error)
         client.server.vprint('[HTTP] 400 Bad Request Error', verbosity.ERROR)
     else:
-        if req['method'] == 'GET':
+        if req['method'] == b'GET':
             uri = req['uri']
-            if uri == '':
-                filename = 'index.html'
+            if uri == b'':
+                filename = b'index.html'
             else:
                 filename = uri            
             content_type = get_content_type(filename)
-            path = os.path.join('./public_html', filename)
+            path = os.path.join(b'./public_html', filename)
             if not os.path.isfile(path):
                 respond_404(client)
-                client.server.vprint('[HTTP] 404 NOT FOUND: %s' % path,
-                    verbosity.WARN) 
+                client.server.vprint('[HTTP] 404 NOT FOUND: %s' % 
+                    path.decode(), verbosity.WARN) 
             else:
-                client.server.vprint('[HTTP] GET %s' % path, verbosity.INFO)
+                client.server.vprint('[HTTP] GET %s' % path.decode(),
+                    verbosity.INFO)
                 content = open(path, 'rb').read()
                 respond_200(client, content_type,  filename, len(content))
                 client.send(content)
