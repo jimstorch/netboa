@@ -17,5 +17,12 @@ if sys.platform == 'linux2':
     from netboa.tcp.epoll_server import EpollServer as Server
 else:
     from netboa.tcp.select_server import SelectServer as Server
-from netboa.service import Service
 
+if sys.version_info[0] >= 3:
+    from netboa.compat import str_to_bytes_python3 as str_to_bytes
+    from netboa.compat import bytes_to_str_python3 as bytes_to_str
+else:
+    from netboa.compat import str_to_bytes_python2 as str_to_bytes
+    from netboa.compat import bytes_to_str_python2 as bytes_to_str
+
+from netboa.service import Service

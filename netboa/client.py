@@ -14,7 +14,12 @@
 import time
 import socket
 
+from netboa import verbosity
+from netboa import str_to_bytes
+from netboa import bytes_to_str
 from netboa.tcp.tcp_error import NetboaConnectionLost
+
+
 
 
 class Client(object):
@@ -27,8 +32,8 @@ class Client(object):
         self.address = address
         self.port = port
         self.origin = '%s:%d' % (address, port)
-        self.send_buffer = ''
-        self.recv_buffer = ''
+        self.send_buffer = b''
+        self.recv_buffer = b''
         self.connect_time = time.time()
         self.last_input_time = self.connect_time
         self.on_connect = None
@@ -44,20 +49,19 @@ class Client(object):
         return self.fd
 
     def send(self, data):
-        if data:
-            self.send_buffer += data
-            self.server._request_send(self)
-
-    def get_char(self):
-        if self.recv_buffer:
-            return self.recv_buffer.pop()
+        if type(data) == str:
+            self.send_buffer += str_to_bytes(data)
         else:
-            return None
+            self.send_buffer += data
+        self.server._request_send(self)
 
-    def get_input(self):
+    def get_bytes(self):
         data = self.recv_buffer
-        self.recv_buffer = ''
+        self.recv_buffer = b''
         return data
+
+    def get_string(self):
+        return bytes_to_str(self.get_bytes())
 
     def idle(self):
         return time.time() - self.last_input_time
@@ -73,24 +77,26 @@ class Client(object):
         try:
             sent = self.sock.send(self.send_buffer)
         except socket.error:
-            self.server.vprint("[client] Socket error on send")
+            self.server.vprint("[client] Socket error on send", 
+                verbosity.ERROR)
             raise NetboaConnectionLost()
         if sent < size:
             self.send_buffer = self.send_buffer[sent:]
-            self.server.vprint("[client] Partial send")
+            self.server.vprint("[client] Partial send", verbosity.WARN)
         else:
-            self.send_buffer = ''
+            self.send_buffer = b''
             self.server._clear_send(self)
 
     def _socket_recv(self):
         try:
             data = self.sock.recv(2048)
         except socket.error:
-            self.server.vprint("[client] Socket error on read") 
+            self.server.vprint("[client] Socket error on read", verbosity.WARN) 
             raise NetboaConnectionLost()
         size = len(data)
         if size == 0:
-            self.server.vprint("[client] Connection terminated")
+            self.server.vprint("[client] Connection terminated", 
+                verbosity.DEBUG)
             raise NetboaConnectionLost()
         self.last_input_time = time.time()
         self.recv_buffer += data
