@@ -35,7 +35,7 @@ websocket = WebSocketService(port=7778)
 
 ## Create our server
 server = Server((http, websocket))
-server.verbosity = verbosity.DEBUG
+server.verbosity = verbosity.INFO
 
 
 print('--> HTTP Service running on port %d' % http.port)
