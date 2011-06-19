@@ -54,7 +54,7 @@ def debug_on_connect(client):
         client.origin, verbosity.INFO)
 
 def debug_on_disconnect(client):
-    print('[WebSocket] Lost Connection with %s' % client.origin, 
+    client.server.vprint('[WebSocket] Lost Connection with %s' % client.origin, 
         verbosity.INFO) 
 
 def debug_on_input(client):

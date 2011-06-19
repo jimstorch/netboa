@@ -1,14 +1,20 @@
 <!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <html>
 <head>
     <title>Hello World</title>
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+    <link rel="stylesheet" href="netboa.css" type="text/css" />
+    <script type="text/javascript" src="contrib/jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="netboa.js"></script>
 </head>
 <body>
-    <h2>Hello World!</h2>
-    <img src="images/skull.png"/>
-    <br />
-    <br />
-    <a href=ws_test.html>WebSocket Test</a>
+    <!-- <img src="images/skull.png"/> -->
+    <button onclick="websocket.send('POKE')" >POKE!</button>
+    <button onclick="websocket.send('PUNCH')" >PUNCH!</button>
+    <button onclick="websocket.send('JAB')">JAB!</button>
 </body>
 </html>
+
+
