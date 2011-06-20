@@ -13,31 +13,35 @@
 
 var websocket = new WebSocket("ws://localhost:7778");
 
-websocket.onopen = function ()
-    {
+websocket.onopen = function () {
     console.log("WebSocket.onopen");
-    $('<H2>').append("WebSocket Connection Established").appendTo('body')
+    $('<H2>').append("WebSocket Connection Established").appendTo('#header')
     //$('<img>', {src:'images/skull.png'}).appendTo('body');
     };
 
 websocket.onmessage = function (evt) {
+    var el = $('<p>').fadeIn('normal');
     console.log(evt.data);
-    var el = $('<p>');
+
     el.append(evt.data);
     el.addClass('chatbox');
-    el.appendTo('body');
-    if ( $('p').size() > 10 ) {
-        $('p:first').remove();
+    el.appendTo('#content');
+
+
+    if ( $('#content p').size() > 150 ) {
+        $('#content p:first').remove();
         }
+    // Scroll to the bottom chat
+    $("#content").scrollTop($("#content")[0].scrollHeight);
     };
 
 websocket.onclose = function() {
     console.log("WebSocket.onclose");
-    $('<H2>').append("WebSocket Connection Lost").appendTo('body')
+    $('<H2>').append("WebSocket Connection Lost").appendTo('#header')
     };
 
 websocket.onerror = function (evt) {
     console.log('Error occured: ' + evt.data);
-    $('<H2>').append("WebSocket Error: " + evt.data).appendTo('body')
+    $('<H2>').append("WebSocket Error: " + evt.data).appendTo('#header')
     }
 

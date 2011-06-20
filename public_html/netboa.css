@@ -29,9 +29,41 @@ body {
     line-height:1.2em;
     }
 
-.chatbox {
-    border: 1px solid black;
-    margin: 4px; 
-    padding: 4px; 
-    background-color: #636363;
+
+#container {
+	width:960px;
+	margin:20px auto;
     }
+
+#header {
+    padding: 4px;
+    }
+
+#content {
+	float:left;
+	width:640px;
+    height: 512px;
+    overflow: auto;
+    }
+
+#sidebar {
+	float:left;
+	width:320px;
+    }
+
+#footer {
+	clear:both;
+    }
+
+.chatbox {
+    border-top: 1px solid #888;
+    border-left: 1px solid #666;
+    border-right: 1px solid #444;
+    border-bottom: 1px solid #222;
+    margin: 2px; 
+    padding: 2px; 
+    background-color: #4B5234;
+    font-size: .9em; 
+    }
+
+
