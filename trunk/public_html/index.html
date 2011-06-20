@@ -2,18 +2,35 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <html>
 <head>
-    <title>Hello World</title>
+    <title>WebSocket Demo</title>
     <meta charset="UTF-8">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
     <link rel="stylesheet" href="netboa.css" type="text/css" />
     <script type="text/javascript" src="contrib/jquery-1.6.1.min.js"></script>
     <script type="text/javascript" src="netboa.js"></script>
 </head>
-<body>
-    <!-- <img src="images/skull.png"/> -->
-    <button onclick="websocket.send('POKE')" >POKE!</button>
-    <button onclick="websocket.send('PUNCH')" >PUNCH!</button>
-    <button onclick="websocket.send('JAB')">JAB!</button>
+
+<div id="container">
+
+<div id="header">
+</div><!-- end div header -->
+
+<div id="content">
+ 
+</div><!-- end div content -->
+
+<div id="sidebar">
+<button onclick="websocket.send('POKE')" >POKE!</button><br />
+<button onclick="websocket.send('PUNCH')" >PUNCH!</button><br />
+<button onclick="websocket.send('JAB')">JAB!</button><br />
+</div><!-- end div sidebar -->
+
+<div id="footer">
+</div><!-- end div footer -->
+This is a footer
+</div><!-- end div container -->
+
+
 </body>
 </html>
 

@@ -12,8 +12,8 @@
 #------------------------------------------------------------------------------
 
 
-def action(
-
+def action():
+    pass
 
 def clicky(label, style, action):
     return({
@@ -26,4 +26,11 @@ def clicky(label, style, action):
     })
 
 
- 
+def div_chat():
+    pass
+
+
+msg = []
+
+    
+
