@@ -11,7 +11,9 @@
 #   under the License.
 -----------------------------------------------------------------------------*/
 
-var websocket = new WebSocket("ws://localhost:7778");
+var WS_PORT = 7778
+var ws_host = 'ws://' + document.domain + ':' + WS_PORT;
+var websocket = new WebSocket(ws_host);
 
 websocket.onopen = function () {
     console.log("WebSocket.onopen");
@@ -27,8 +29,7 @@ websocket.onmessage = function (evt) {
     el.addClass('chatbox');
     el.appendTo('#content');
 
-
-    if ( $('#content p').size() > 150 ) {
+    if ( $('#content p').size() > 100 ) {
         $('#content p:first').remove();
         }
     // Scroll to the bottom chat
@@ -44,4 +45,6 @@ websocket.onerror = function (evt) {
     console.log('Error occured: ' + evt.data);
     $('<H2>').append("WebSocket Error: " + evt.data).appendTo('#header')
     }
+
+
 
