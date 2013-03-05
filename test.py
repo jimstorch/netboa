@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #------------------------------------------------------------------------------
 #   test.py
-#   Copyright 2011 Jim Storch
+#   Copyright 2012 Jim Storch
 #   Licensed under the Apache License, Version 2.0 (the "License"); you may
 #   not use this file except in compliance with the License. You may obtain a
 #   copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -35,7 +35,7 @@ websocket = WebSocketService(port=7778)
 
 ## Create our server
 server = Server((http, websocket))
-server.verbosity = verbosity.INFO
+server.verbosity = verbosity.DEBUG
 
 
 print('--> HTTP Service running on port %d' % http.port)

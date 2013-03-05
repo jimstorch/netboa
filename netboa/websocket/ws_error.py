@@ -16,3 +16,15 @@ class NetboaWsBadRequest(Exception):
     Custom exception to signal a malformed WebSocket request.
     """
     pass
+
+class NetboaWsBadFrame(Exception):
+    """
+    Custom exception to signal an error unpacking a frame.
+    """
+    pass
+
+class NetboaWsCloseFrame(Exception):
+    """
+    Custom exception to signal a close frame opcode.
+    """
+    pass

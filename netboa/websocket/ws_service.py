@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #   netboa/websocket/ws_service.py
-#   Copyright 2011 Jim Storch
+#   Copyright 2012 Jim Storch
 #   Licensed under the Apache License, Version 2.0 (the "License"); you may
 #   not use this file except in compliance with the License. You may obtain a
 #   copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -18,7 +18,7 @@ from netboa import verbosity
 from netboa.service import Service
 from netboa.websocket.ws_client import WsClient
 from netboa.websocket.ws_error import NetboaWsBadRequest
-from netboa.websocket.handshake76 import handshake76
+from netboa.websocket.handshake13 import handshake13
 
 
 def tmp_on_connect(client):
@@ -38,7 +38,7 @@ def handshake(client):
     client.server.vprint('[WebSocket Handshake] Request from %s' % 
         client.origin, verbosity.DEBUG)
     try:
-        handshake76(client)
+        handshake13(client)
     except NetboaWsBadRequest as error:
         client.server.vprint('[WebSocket Error] %s' % error, verbosity.ERROR)
         client.deactivate()
@@ -52,6 +52,7 @@ def handshake(client):
 def debug_on_connect(client):
     client.server.vprint('[WebSocket] New Connection from %s' % 
         client.origin, verbosity.INFO)
+    client.send('Welcome!')
 
 def debug_on_disconnect(client):
     client.server.vprint('[WebSocket] Lost Connection with %s' % client.origin, 
